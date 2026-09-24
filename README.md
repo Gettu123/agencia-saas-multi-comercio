@@ -1,20 +1,22 @@
 # Agencia SaaS Multi-Comercio
 
-White-label / multi-tenant para **Agendamiento con Garantía y Fidelidad**.
+White-label de agendamento com garantia e fidelidade.
+Brasil (Pix / R$) + Venezuela (Pago Movil / Bs). Licenca da agencia em USD.
 
-- Brasil: Pix + R$ + pt-BR (`tenant_001_br`)
-- Venezuela: Pago Móvil + Bs + es-VE (`tenant_002_ve`)
-- Licença da agência: USD via Binance Pay, PayPal ou Retorna
-- Pronto para **GitHub Pages** e, depois, empacote em APK com Capacitor
+Site: https://gettu123.github.io/agencia-saas-multi-comercio/
 
-## Demo
+## Acessos demo
+- Dono Aurora: admin@aurora.local / 1234
+- Dono El Leon: admin@leon.local / 1234
+- Super Admin: usd2026
+- Cliente: nome + telefone na vitrine
 
-| Acesso | URL / credencial |
-| --- | --- |
-| Vitrine | `index.html` |
-| Brasil | `admin@aurora.local` / `1234` |
-| Venezuela | `admin@leon.local` / `1234` |
-| Super Admin | senha `usd2026` |
+## Nuvem e push (Firebase)
+1. console.firebase.google.com -> projeto agencia-saas
+2. Firestore modo teste (southamerica-east1)
+3. App Web -> copiar apiKey, projectId, appId
+4. Cloud Messaging -> Web Push certificates -> vapidKey
+5. Colar em data/firebase.json e enabled true
+6. Push com app fechado: cd functions && npm i && firebase deploy --only functions
 
-Repo: https://github.com/Gettu123/agencia-saas-multi-comercio
-Pages: https://Gettu123.github.io/agencia-saas-multi-comercio/
+Contato: +55 19 98608-3932 / sanderolameda@gmail.com
