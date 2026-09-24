@@ -33,19 +33,32 @@
     els.list.innerHTML = approved.length ? approved.map(function (b) {
       return '<article class="booking"><div><strong>' + b.client + '</strong><p>' + b.service + ' \u00b7 ' + b.when + '</p></div><span>' + (b.special ? t("special") : money(b.guarantee || 0)) + '</span></article>';
     }).join("") : '<p class="muted">' + t("empty") + '</p>';
-    els.pending.querySelectorAll("[data-approve]").forEach(function (btn) { btn.addEventListener("click", function () { Store.setStatus(tenantId, btn.dataset.approve, "approved"); renderBookings(); }); });
-    els.pending.querySelectorAll("[data-reject]").forEach(function (btn) { btn.addEventListener("click", function () { Store.setStatus(tenantId, btn.dataset.reject, "rejected"); renderBookings(); }); });
+    els.pending.querySelectorAll("[data-approve]").forEach(function (btn) {
+      btn.addEventListener("click", function () { Store.setStatus(tenantId, btn.dataset.approve, "approved"); renderBookings(); });
+    });
+    els.pending.querySelectorAll("[data-reject]").forEach(function (btn) {
+      btn.addEventListener("click", function () { Store.setStatus(tenantId, btn.dataset.reject, "rejected"); renderBookings(); });
+    });
   }
   function paint() {
     I18N.apply();
     els.loyalty.textContent = Store.listClients(tenantId).length + " " + t("loyalty").toLowerCase();
-    els.service.innerHTML = config.services.map(function (s) { return '<option value="' + s.id + '">' + s.name + ' \u00b7 ' + money(s.price) + '</option>'; }).join("");
+    els.service.innerHTML = config.services.map(function (s) {
+      return '<option value="' + s.id + '">' + s.name + ' \u00b7 ' + money(s.price) + '</option>';
+    }).join("");
     renderBookings();
   }
   async function boot() {
     const validation = await AuthEngine.validateTenant(tenantId);
     if (!validation.active) { location.replace("./login.html?tenant=" + encodeURIComponent(tenantId) + "&blocked=1"); return; }
     if (!session || session.tenant_id !== tenantId) { location.replace("./login.html?tenant=" + encodeURIComponent(tenantId)); return; }
+    if (window.CloudSync) {
+      await CloudSync.init();
+      const remote = await CloudSync.pull(tenantId);
+      if (remote) Store.applyRemote(tenantId, remote);
+      CloudSync.subscribe(tenantId, function (data) { Store.applyRemote(tenantId, data); });
+    }
+    window.addEventListener("agency:data", function () { if (config) paint(); });
     config = await TenantLoader.load(tenantId);
     I18N.mount("#lang-mount");
     if (!localStorage.getItem("agency.lang.v1")) I18N.setLang(config.language || "pt");
