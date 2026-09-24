@@ -1,0 +1,38 @@
+{
+  "version": "1.0.0",
+  "updated_at": "2026-09-24T12:00:00Z",
+  "agency": {
+    "name": "Agencia SaaS Multi-Comercio",
+    "owner": "Marcelo Volponi",
+    "license_currency": "USD",
+    "monthly_fee_usd": 29,
+    "regularization": {
+      "binance_pay": "BINANCE-PAY-ID-AGENCIA",
+      "paypal": "paypal.me/agenciasaas",
+      "retorna": "RETORNA-ID-AGENCIA",
+      "whatsapp": "+55 19 99999-0000",
+      "email": "licencias@agencia-saas.com",
+      "note": "Cobranca internacional da licenca mensal em dolares (USD)."
+    }
+  },
+  "tenants": [
+    {
+      "tenant_id": "tenant_001_br",
+      "trade_name": "Studio Aurora Beleza",
+      "country": "BR",
+      "status": "Activo",
+      "plan": "Pro",
+      "license_until": "2026-10-24",
+      "monthly_fee_usd": 29
+    },
+    {
+      "tenant_id": "tenant_002_ve",
+      "trade_name": "Barberia El Leon",
+      "country": "VE",
+      "status": "Activo",
+      "plan": "Pro",
+      "license_until": "2026-10-24",
+      "monthly_fee_usd": 29
+    }
+  ]
+}

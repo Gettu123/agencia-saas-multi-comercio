@@ -1,0 +1,25 @@
+{
+  "tenant_id": "tenant_002_ve",
+  "slug": "leon",
+  "locale": "es-VE",
+  "language": "es",
+  "country": "VE",
+  "timezone": "America/Caracas",
+  "brand": {
+    "name": "Barberia El Leon",
+    "tagline": "Agendamiento con Garantia y Fidelidad",
+    "logo_text": "El Leon",
+    "accent": "#B45309",
+    "accent_dark": "#92400E",
+    "accent_soft": "#FFEDD5"
+  },
+  "currency": { "code": "VES", "symbol": "Bs", "locale": "es-VE" },
+  "gateway": "pagomovil",
+  "demo_users": [{ "email": "admin@leon.local", "password": "1234", "role": "owner", "name": "Carlos Mendez" }],
+  "services": [
+    { "id": "corte", "name": "Corte clasico", "duration_min": 40, "price": 450, "guarantee": 80 },
+    { "id": "barba", "name": "Barba + toalla caliente", "duration_min": 30, "price": 280, "guarantee": 50 },
+    { "id": "combo", "name": "Combo corte + barba", "duration_min": 70, "price": 680, "guarantee": 120 }
+  ],
+  "loyalty": { "points_per_currency": 1, "reward_every": 8, "reward_label": "1 corte gratis" }
+}

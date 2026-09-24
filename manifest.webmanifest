@@ -1,0 +1,9 @@
+{
+  "name": "Agencia SaaS Multi-Comercio",
+  "short_name": "Agencia SaaS",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F6F4EF",
+  "theme_color": "#0F766E",
+  "lang": "pt-BR"
+}

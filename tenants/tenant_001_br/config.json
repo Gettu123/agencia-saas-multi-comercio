@@ -1,0 +1,25 @@
+{
+  "tenant_id": "tenant_001_br",
+  "slug": "aurora",
+  "locale": "pt-BR",
+  "language": "pt",
+  "country": "BR",
+  "timezone": "America/Sao_Paulo",
+  "brand": {
+    "name": "Studio Aurora Beleza",
+    "tagline": "Agendamento com Garantia e Fidelidade",
+    "logo_text": "Aurora",
+    "accent": "#0F766E",
+    "accent_dark": "#115E59",
+    "accent_soft": "#CCFBF1"
+  },
+  "currency": { "code": "BRL", "symbol": "R$", "locale": "pt-BR" },
+  "gateway": "pix",
+  "demo_users": [{ "email": "admin@aurora.local", "password": "1234", "role": "owner", "name": "Ana Souza" }],
+  "services": [
+    { "id": "corte", "name": "Corte + finalizacao", "duration_min": 60, "price": 90, "guarantee": 20 },
+    { "id": "color", "name": "Coloracao", "duration_min": 120, "price": 220, "guarantee": 50 },
+    { "id": "manicure", "name": "Manicure completa", "duration_min": 45, "price": 55, "guarantee": 15 }
+  ],
+  "loyalty": { "points_per_currency": 1, "reward_every": 10, "reward_label": "1 servico gratis" }
+}
