@@ -43,12 +43,21 @@
   <script src="../core/gateways/payment-hub.js"></script>
   <script src="../js/i18n.js"></script>
   <script src="../js/tenant-loader.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="../js/cloud-sync.js"></script>
   <script src="../js/store.js"></script>
   <script>
     (async function () {
       const tenantId = new URLSearchParams(location.search).get("tenant") || "tenant_001_br";
       const validation = await AuthEngine.validateTenant(tenantId);
       if (!validation.active) { location.replace("./login.html?tenant=" + encodeURIComponent(tenantId) + "&blocked=1"); return; }
+      if (window.CloudSync) {
+        await CloudSync.init();
+        const remote = await CloudSync.pull(tenantId);
+        if (remote) Store.applyRemote(tenantId, remote);
+        CloudSync.subscribe(tenantId, function (data) { Store.applyRemote(tenantId, data); });
+      }
       const config = await TenantLoader.load(tenantId);
       I18N.mount("#lang-mount");
       if (!localStorage.getItem("agency.lang.v1")) I18N.setLang(config.language || "pt");
@@ -58,6 +67,7 @@
       const gw = PaymentGateways[config.gateway];
       function money(v) { return gw.formatMoney(v); }
       function paintMine() {
+        if (!client) return;
         const items = Store.listBookings(tenantId).filter(function (b) { return b.phone === client.phone; });
         document.querySelector("#mine").innerHTML = items.length ? items.map(function (b) {
           return '<article class="booking"><div><strong>' + b.service + '</strong><p>' + b.when + '</p></div><span>' + I18N.t(b.status) + '</span></article>';
@@ -85,7 +95,8 @@
         PaymentHub.renderLocal(document.querySelector("#pay-panel"), config, { amount: service.guarantee, reference: service.name + " \u00b7 " + client.name });
         paintMine();
       });
-      window.addEventListener("agency:lang", function () { I18N.apply(); if (client) paintMine(); });
+      window.addEventListener("agency:lang", function () { I18N.apply(); paintMine(); });
+      window.addEventListener("agency:data", paintMine);
     })();
   </script>
 </body>
