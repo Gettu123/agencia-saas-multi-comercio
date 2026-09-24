@@ -1,12 +1,8 @@
 (function (global) {
   const CloudSync = {
-    ready: false,
-    db: null,
-    unsub: {},
+    ready: false, db: null, unsub: {},
     configUrl: function () {
-      const here = location.pathname;
-      if (here.indexOf("/templates/") >= 0 || here.indexOf("/admin/") >= 0) return "../data/firebase.json";
-      return "data/firebase.json";
+      return location.pathname.indexOf("/templates/") >= 0 || location.pathname.indexOf("/admin/") >= 0 ? "../data/firebase.json" : "data/firebase.json";
     },
     init: async function () {
       try {
@@ -29,6 +25,17 @@
     push: async function (tenantId, payload) {
       if (!this.ready) return;
       await this.ref(tenantId).set({ clients: payload.clients || [], bookings: payload.bookings || [], updated_at: new Date().toISOString() }, { merge: true });
+    },
+    alert: async function (tenantId, note) {
+      if (!this.ready) return;
+      const row = Object.assign({ id: note.id || String(Date.now()), title: note.title || "Novo agendamento", body: note.body || "", at: new Date().toISOString() }, note);
+      await this.ref(tenantId).collection("alerts").doc(row.id).set(row);
+    },
+    listenAlerts: function (tenantId, onNote) {
+      if (!this.ready) return function () {};
+      return this.ref(tenantId).collection("alerts").orderBy("at", "desc").limit(1).onSnapshot(function (snap) {
+        snap.docChanges().forEach(function (change) { if (change.type === "added") onNote(change.doc.data()); });
+      });
     },
     subscribe: function (tenantId, onData) {
       if (!this.ready) return function () {};
