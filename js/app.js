@@ -10,38 +10,36 @@
     gatewayBadge: document.querySelector("[data-gateway]"),
     service: document.querySelector("#service"),
     client: document.querySelector("#client"),
+    phone: document.querySelector("#phone"),
+    special: document.querySelector("#special"),
     when: document.querySelector("#when"),
     form: document.querySelector("#booking-form"),
     list: document.querySelector("#bookings"),
+    pending: document.querySelector("#pending"),
     pay: document.querySelector("#pay-panel"),
     loyalty: document.querySelector("#loyalty-points"),
     logout: document.querySelector("#logout")
   };
   let config;
-  const storeKey = "agency.bookings." + tenantId;
   function t(key) { return I18N.t(key); }
-  function money(value) {
-    const gw = PaymentGateways[config.gateway];
-    return gw ? gw.formatMoney(value) : String(value);
-  }
-  function loadBookings() { try { return JSON.parse(localStorage.getItem(storeKey) || "[]"); } catch { return []; } }
-  function saveBookings(items) { localStorage.setItem(storeKey, JSON.stringify(items)); }
+  function money(value) { const gw = PaymentGateways[config.gateway]; return gw ? gw.formatMoney(value) : String(value); }
   function renderBookings() {
-    const items = loadBookings();
-    if (!items.length) { els.list.innerHTML = '<p class="muted">' + t("empty") + '</p>'; return; }
-    els.list.innerHTML = items.map(function (b) {
-      return '<article class="booking"><div><strong>' + b.client + '</strong><p>' + b.service + ' \u00b7 ' + b.when + '</p></div><span>' + money(b.guarantee) + ' ' + t("guarantee").toLowerCase() + '</span></article>';
-    }).join("");
-  }
-  function fillServices() {
-    els.service.innerHTML = config.services.map(function (s) {
-      return '<option value="' + s.id + '">' + s.name + ' \u00b7 ' + money(s.price) + ' (' + t("guarantee") + ' ' + money(s.guarantee) + ')</option>';
-    }).join("");
+    const items = Store.listBookings(tenantId);
+    const pending = items.filter(function (b) { return b.status === "pending"; });
+    const approved = items.filter(function (b) { return b.status === "approved"; });
+    els.pending.innerHTML = pending.length ? pending.map(function (b) {
+      return '<article class="booking"><div><strong>' + b.client + '</strong><p>' + b.service + ' \u00b7 ' + b.when + '</p></div><div class="nav-actions"><button class="btn btn-ok" data-approve="' + b.id + '">' + t("approve") + '</button><button class="btn btn-danger" data-reject="' + b.id + '">' + t("reject") + '</button></div></article>';
+    }).join("") : '<p class="muted">' + t("empty") + '</p>';
+    els.list.innerHTML = approved.length ? approved.map(function (b) {
+      return '<article class="booking"><div><strong>' + b.client + '</strong><p>' + b.service + ' \u00b7 ' + b.when + '</p></div><span>' + (b.special ? t("special") : money(b.guarantee || 0)) + '</span></article>';
+    }).join("") : '<p class="muted">' + t("empty") + '</p>';
+    els.pending.querySelectorAll("[data-approve]").forEach(function (btn) { btn.addEventListener("click", function () { Store.setStatus(tenantId, btn.dataset.approve, "approved"); renderBookings(); }); });
+    els.pending.querySelectorAll("[data-reject]").forEach(function (btn) { btn.addEventListener("click", function () { Store.setStatus(tenantId, btn.dataset.reject, "rejected"); renderBookings(); }); });
   }
   function paint() {
     I18N.apply();
-    els.loyalty.textContent = (session.points || 120) + ' ' + t("points");
-    fillServices();
+    els.loyalty.textContent = Store.listClients(tenantId).length + " " + t("loyalty").toLowerCase();
+    els.service.innerHTML = config.services.map(function (s) { return '<option value="' + s.id + '">' + s.name + ' \u00b7 ' + money(s.price) + '</option>'; }).join("");
     renderBookings();
   }
   async function boot() {
@@ -56,17 +54,20 @@
     els.localeBadge.textContent = config.locale;
     els.moneyBadge.textContent = config.currency.symbol + " \u00b7 " + config.currency.code;
     els.gatewayBadge.textContent = config.gateway === "pix" ? "Pix" : "Pago Movil";
-    const start = new Date(); start.setMinutes(0,0,0); start.setHours(start.getHours()+2);
-    els.when.value = start.toISOString().slice(0,16);
+    const start = new Date(); start.setMinutes(0,0,0); start.setHours(start.getHours() + 2);
+    els.when.value = start.toISOString().slice(0, 16);
     paint();
   }
   els.form.addEventListener("submit", function (ev) {
     ev.preventDefault();
     const service = config.services.find(function (s) { return s.id === els.service.value; });
-    const booking = { id: crypto.randomUUID(), client: els.client.value.trim(), service: service.name, when: els.when.value.replace("T", " "), guarantee: service.guarantee, created_at: new Date().toISOString() };
-    const items = loadBookings(); items.unshift(booking); saveBookings(items); renderBookings();
-    PaymentGateways[config.gateway].renderPanel(els.pay, PaymentGateways[config.gateway].generatePayload({ amount: service.guarantee, reference: booking.service + " \u00b7 " + booking.client, merchant: config.brand.name }));
-    els.client.value = "";
+    const special = !!(els.special && els.special.checked);
+    const client = Store.upsertClient(tenantId, { name: els.client.value.trim(), phone: els.phone.value });
+    Store.addBooking(tenantId, { id: crypto.randomUUID(), client: client.name, phone: client.phone, service: service.name, when: els.when.value.replace("T", " "), guarantee: special ? 0 : service.guarantee, prepaid: !special, special: special, status: "approved", created_at: new Date().toISOString() });
+    renderBookings();
+    if (!special) PaymentHub.renderLocal(els.pay, config, { amount: service.guarantee, reference: service.name + " \u00b7 " + client.name });
+    else els.pay.innerHTML = '<p class="muted">' + t("special") + '</p>';
+    els.client.value = ""; els.phone.value = ""; if (els.special) els.special.checked = false;
   });
   els.logout.addEventListener("click", function () { AuthEngine.clearSession(); location.replace("./login.html?tenant=" + encodeURIComponent(tenantId)); });
   window.addEventListener("agency:lang", paint);

@@ -4,9 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Agenda</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/agency-theme.css" />
 </head>
 <body>
@@ -21,33 +18,41 @@
         <button class="btn btn-ghost" id="logout" data-i18n="logout">Sair</button>
       </div>
     </header>
-    <section class="grid grid-3" style="margin:22px 0;">
-      <article class="card"><p class="kicker" data-i18n="loyalty"></p><h2 id="loyalty-points"></h2><p class="muted" data-i18n="loyalty_help"></p></article>
-      <article class="card"><p class="kicker" data-i18n="guarantee"></p><h2 data-i18n="payment_method"></h2><p class="muted" data-i18n="pay_help"></p></article>
-      <article class="card"><p class="kicker" data-i18n="license"></p><h2>USD</h2><p class="muted" data-i18n="license_help"></p></article>
+    <section class="grid grid-3" style="margin:22px 0">
+      <article class="card"><p class="kicker" data-i18n="loyalty">Fidelidade</p><h2 id="loyalty-points">0</h2></article>
+      <article class="card"><p class="kicker" data-i18n="guarantee">Garantia</p><h2 data-i18n="payment_method">Pagamento local</h2></article>
+      <article class="card"><p class="kicker" data-i18n="license">Licenca</p><h2>USD</h2></article>
     </section>
     <section class="grid grid-2">
       <article class="card">
-        <h2 data-i18n="new_booking"></h2>
+        <h2 data-i18n="new_booking">Novo agendamento</h2>
         <form id="booking-form">
-          <label data-i18n="client"></label>
-          <input id="client" required data-i18n-placeholder="client_ph" />
-          <label data-i18n="service"></label>
-          <select id="service"></select>
-          <label data-i18n="when"></label>
-          <input id="when" type="datetime-local" required />
-          <div style="margin-top:16px;"><button class="btn btn-primary" type="submit" data-i18n="confirm_pay"></button></div>
+          <label data-i18n="client">Cliente</label><input id="client" required />
+          <label data-i18n="phone">Telefone</label><input id="phone" required inputmode="tel" />
+          <label data-i18n="service">Servico</label><select id="service"></select>
+          <label data-i18n="when">Horario</label><input id="when" type="datetime-local" required />
+          <label style="display:flex;gap:8px;align-items:center"><input id="special" type="checkbox" style="width:auto" /><span data-i18n="special">Cliente fixo</span></label>
+          <div style="margin-top:16px"><button class="btn btn-primary" type="submit" data-i18n="confirm_pay">Reservar</button></div>
         </form>
-        <div id="pay-panel" style="margin-top:18px;"></div>
+        <div id="pay-panel" style="margin-top:18px"></div>
       </article>
-      <article class="card"><h2 data-i18n="upcoming"></h2><div id="bookings"></div></article>
+      <article class="card">
+        <h2 data-i18n="pending">Pendentes</h2>
+        <div id="pending"></div>
+        <h2 style="margin-top:22px" data-i18n="upcoming">Agenda</h2>
+        <div id="bookings"></div>
+      </article>
     </section>
   </main>
+  <script src="../core/license-code.js"></script>
   <script src="../core/auth-engine.js"></script>
+  <script src="../core/gateways/pix-emv.js"></script>
   <script src="../core/gateways/pix-gateway.js"></script>
   <script src="../core/gateways/pagomovil-gateway.js"></script>
+  <script src="../core/gateways/payment-hub.js"></script>
   <script src="../js/i18n.js"></script>
   <script src="../js/tenant-loader.js"></script>
+  <script src="../js/store.js"></script>
   <script src="../js/app.js"></script>
 </body>
 </html>
