@@ -6,18 +6,25 @@
   "country": "VE",
   "timezone": "America/Caracas",
   "brand": {
-    "name": "Barberia El Leon",
-    "tagline": "Agendamiento con Garantia y Fidelidad",
-    "logo_text": "El Leon",
+    "name": "Barbería El León",
+    "tagline": "Agendamiento con Garantía y Fidelidad",
+    "logo_text": "El León",
     "accent": "#B45309",
     "accent_dark": "#92400E",
     "accent_soft": "#FFEDD5"
   },
   "currency": { "code": "VES", "symbol": "Bs", "locale": "es-VE" },
   "gateway": "pagomovil",
-  "demo_users": [{ "email": "admin@leon.local", "password": "1234", "role": "owner", "name": "Carlos Mendez" }],
+  "payments": {
+    "provider": "pagomovil",
+    "bank": "0134 — Banesco",
+    "phone": "0412-5558899",
+    "rif": "J-40112233-0",
+    "cedula": "V-14555666"
+  },
+  "demo_users": [{ "email": "admin@leon.local", "password": "1234", "role": "owner", "name": "Carlos Méndez" }],
   "services": [
-    { "id": "corte", "name": "Corte clasico", "duration_min": 40, "price": 450, "guarantee": 80 },
+    { "id": "corte", "name": "Corte clásico", "duration_min": 40, "price": 450, "guarantee": 80 },
     { "id": "barba", "name": "Barba + toalla caliente", "duration_min": 30, "price": 280, "guarantee": 50 },
     { "id": "combo", "name": "Combo corte + barba", "duration_min": 70, "price": 680, "guarantee": 120 }
   ],

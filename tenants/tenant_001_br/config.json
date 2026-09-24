@@ -15,11 +15,17 @@
   },
   "currency": { "code": "BRL", "symbol": "R$", "locale": "pt-BR" },
   "gateway": "pix",
+  "payments": {
+    "provider": "pix",
+    "pix_key": "aurora.beleza@pix.com.br",
+    "merchant_name": "STUDIO AURORA BELEZA",
+    "city": "PIRACICABA"
+  },
   "demo_users": [{ "email": "admin@aurora.local", "password": "1234", "role": "owner", "name": "Ana Souza" }],
   "services": [
-    { "id": "corte", "name": "Corte + finalizacao", "duration_min": 60, "price": 90, "guarantee": 20 },
-    { "id": "color", "name": "Coloracao", "duration_min": 120, "price": 220, "guarantee": 50 },
+    { "id": "corte", "name": "Corte + finalização", "duration_min": 60, "price": 90, "guarantee": 20 },
+    { "id": "color", "name": "Coloração", "duration_min": 120, "price": 220, "guarantee": 50 },
     { "id": "manicure", "name": "Manicure completa", "duration_min": 45, "price": 55, "guarantee": 15 }
   ],
-  "loyalty": { "points_per_currency": 1, "reward_every": 10, "reward_label": "1 servico gratis" }
+  "loyalty": { "points_per_currency": 1, "reward_every": 10, "reward_label": "1 serviço grátis" }
 }
