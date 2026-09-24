@@ -13,42 +13,30 @@
 <body>
   <main class="shell">
     <header class="topbar">
-      <div class="brand-mark">
-        <span class="logo-dot">A</span>
-        Agencia SaaS · White-Label
-      </div>
+      <div class="brand-mark"><span class="logo-dot">A</span><span data-i18n="agency_name">Agencia SaaS</span></div>
       <div class="nav-actions">
-        <a class="btn btn-ghost" href="admin/super-admin.html">Super Admin</a>
+        <div id="lang-mount"></div>
+        <a class="btn btn-ghost" href="admin/super-admin.html" data-i18n="super_admin">Super Admin</a>
       </div>
     </header>
     <section class="hero">
-      <p class="kicker">Multi-tenant · Brasil + Venezuela</p>
-      <h1>Agendamiento con Garantía y Fidelidad</h1>
-      <p class="muted">Marca branca para comércios no Brasil (Pix / R$) e na Venezuela (Pago Móvil / Bs). Licenças cobradas do exterior em USD via Binance Pay, PayPal ou Retorna.</p>
-      <div class="pills">
-        <span class="pill">tenant_001_br</span>
-        <span class="pill">tenant_002_ve</span>
-        <span class="pill">GitHub Pages ready</span>
-      </div>
+      <p class="kicker" data-i18n="showcase_kicker">Multi-tenant</p>
+      <h1 data-i18n="product">Agendamiento con Garantia y Fidelidad</h1>
+      <p class="muted" data-i18n="showcase_lead">White-label Brasil + Venezuela.</p>
+      <div class="pills"><span class="pill">PT \u00b7 ES \u00b7 EN</span></div>
     </section>
     <section class="chooser">
       <a class="tenant-card" href="templates/login.html?tenant=tenant_001_br">
-        <div>
-          <p class="kicker">Brasil · pt-BR · R$</p>
-          <h2>Studio Aurora Beleza</h2>
-          <p class="muted">Pix · garantia em reais · fidelidade</p>
-        </div>
-        <span class="btn btn-primary">Abrir</span>
+        <div><p class="kicker">Brasil \u00b7 R$</p><h2>Studio Aurora Beleza</h2><p class="muted" data-i18n="tenant_br_meta">Pix</p></div>
+        <span class="btn btn-primary" data-i18n="open">Abrir</span>
       </a>
       <a class="tenant-card" href="templates/login.html?tenant=tenant_002_ve">
-        <div>
-          <p class="kicker">Venezuela · es-VE · Bs</p>
-          <h2>Barbería El León</h2>
-          <p class="muted">Pago Móvil · garantía en bolívares</p>
-        </div>
-        <span class="btn btn-primary">Abrir</span>
+        <div><p class="kicker">Venezuela \u00b7 Bs</p><h2>Barberia El Leon</h2><p class="muted" data-i18n="tenant_ve_meta">Pago Movil</p></div>
+        <span class="btn btn-primary" data-i18n="open">Abrir</span>
       </a>
     </section>
   </main>
+  <script src="js/i18n.js"></script>
+  <script>I18N.mount("#lang-mount"); I18N.apply();</script>
 </body>
 </html>

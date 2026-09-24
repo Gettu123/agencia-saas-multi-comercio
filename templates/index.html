@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Agenda \u00b7 Agencia SaaS</title>
+  <title>Agenda</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet" />
@@ -12,57 +12,35 @@
 <body>
   <main class="shell">
     <header class="topbar">
-      <div class="brand-mark">
-        <span class="logo-dot">A</span>
-        <div>
-          <div data-brand>Comercio</div>
-          <small class="muted" data-tagline></small>
-        </div>
-      </div>
+      <div class="brand-mark"><span class="logo-dot">A</span><div><div data-brand></div><small class="muted" data-tagline></small></div></div>
       <div class="nav-actions">
+        <div id="lang-mount"></div>
         <span class="pill" data-locale></span>
         <span class="pill" data-money></span>
         <span class="pill" data-gateway></span>
         <button class="btn btn-ghost" id="logout" data-i18n="logout">Sair</button>
       </div>
     </header>
-    <section class="grid grid-3" style="margin: 22px 0;">
-      <article class="card">
-        <p class="kicker" data-i18n="loyalty">Fidelidade</p>
-        <h2 id="loyalty-points">120</h2>
-        <p class="muted">Programa white-label por comercio</p>
-      </article>
-      <article class="card">
-        <p class="kicker" data-i18n="guarantee">Garantia</p>
-        <h2 data-i18n="payment_method">Pagamento local</h2>
-        <p class="muted">Pix no Brasil \u00b7 Pago Movil na Venezuela</p>
-      </article>
-      <article class="card">
-        <p class="kicker">Licenca</p>
-        <h2>USD</h2>
-        <p class="muted">Cobranca da agencia no exterior</p>
-      </article>
+    <section class="grid grid-3" style="margin:22px 0;">
+      <article class="card"><p class="kicker" data-i18n="loyalty"></p><h2 id="loyalty-points"></h2><p class="muted" data-i18n="loyalty_help"></p></article>
+      <article class="card"><p class="kicker" data-i18n="guarantee"></p><h2 data-i18n="payment_method"></h2><p class="muted" data-i18n="pay_help"></p></article>
+      <article class="card"><p class="kicker" data-i18n="license"></p><h2>USD</h2><p class="muted" data-i18n="license_help"></p></article>
     </section>
     <section class="grid grid-2">
       <article class="card">
-        <h2 data-i18n="new_booking">Novo agendamento</h2>
+        <h2 data-i18n="new_booking"></h2>
         <form id="booking-form">
-          <label data-i18n="client">Cliente</label>
-          <input id="client" required placeholder="Nome" />
-          <label data-i18n="service">Servico</label>
+          <label data-i18n="client"></label>
+          <input id="client" required data-i18n-placeholder="client_ph" />
+          <label data-i18n="service"></label>
           <select id="service"></select>
-          <label data-i18n="when">Horario</label>
+          <label data-i18n="when"></label>
           <input id="when" type="datetime-local" required />
-          <div style="margin-top:16px;">
-            <button class="btn btn-primary" type="submit" data-i18n="confirm_pay">Reservar com garantia</button>
-          </div>
+          <div style="margin-top:16px;"><button class="btn btn-primary" type="submit" data-i18n="confirm_pay"></button></div>
         </form>
         <div id="pay-panel" style="margin-top:18px;"></div>
       </article>
-      <article class="card">
-        <h2 data-i18n="upcoming">Proximos horarios</h2>
-        <div id="bookings"></div>
-      </article>
+      <article class="card"><h2 data-i18n="upcoming"></h2><div id="bookings"></div></article>
     </section>
   </main>
   <script src="../core/auth-engine.js"></script>
