@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cliente</title>
+  <link rel="stylesheet" href="../css/agency-theme.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand-mark"><span class="logo-dot">C</span><span data-brand></span></div>
+      <div class="nav-actions"><div id="lang-mount"></div><a class="btn btn-ghost" href="../index.html" data-i18n="switch_tenant">Trocar</a></div>
+    </header>
+    <section class="hero" id="identify">
+      <p class="kicker" data-i18n="loyalty">Fidelidade</p>
+      <h1 data-i18n="client_area">Sou cliente</h1>
+      <form id="id-form">
+        <label data-i18n="name">Nome</label><input id="name" required />
+        <label data-i18n="phone">Telefone</label><input id="phone" required inputmode="tel" />
+        <div style="margin-top:16px"><button class="btn btn-primary" type="submit" data-i18n="detect_loyalty">Entrar</button></div>
+      </form>
+    </section>
+    <section id="app" hidden>
+      <article class="card"><p class="kicker" data-i18n="loyalty"></p><h2 id="hello"></h2><p class="muted" id="points"></p></article>
+      <article class="card" style="margin-top:18px">
+        <h2 data-i18n="new_booking">Reservar</h2>
+        <form id="book-form">
+          <label data-i18n="service">Servico</label><select id="service"></select>
+          <label data-i18n="when">Horario</label><input id="when" type="datetime-local" required />
+          <div style="margin-top:16px"><button class="btn btn-primary" type="submit" data-i18n="confirm_pay">Reservar</button></div>
+        </form>
+        <div id="pay-panel" style="margin-top:18px"></div>
+        <div id="mine" style="margin-top:18px"></div>
+      </article>
+    </section>
+  </main>
+  <script src="../core/license-code.js"></script>
+  <script src="../core/auth-engine.js"></script>
+  <script src="../core/gateways/pix-emv.js"></script>
+  <script src="../core/gateways/pix-gateway.js"></script>
+  <script src="../core/gateways/pagomovil-gateway.js"></script>
+  <script src="../core/gateways/payment-hub.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/tenant-loader.js"></script>
+  <script src="../js/store.js"></script>
+  <script>
+    (async function () {
+      const tenantId = new URLSearchParams(location.search).get("tenant") || "tenant_001_br";
+      const validation = await AuthEngine.validateTenant(tenantId);
+      if (!validation.active) { location.replace("./login.html?tenant=" + encodeURIComponent(tenantId) + "&blocked=1"); return; }
+      const config = await TenantLoader.load(tenantId);
+      I18N.mount("#lang-mount");
+      if (!localStorage.getItem("agency.lang.v1")) I18N.setLang(config.language || "pt");
+      I18N.apply();
+      document.querySelector("[data-brand]").textContent = config.brand.name;
+      let client = null;
+      const gw = PaymentGateways[config.gateway];
+      function money(v) { return gw.formatMoney(v); }
+      function paintMine() {
+        const items = Store.listBookings(tenantId).filter(function (b) { return b.phone === client.phone; });
+        document.querySelector("#mine").innerHTML = items.length ? items.map(function (b) {
+          return '<article class="booking"><div><strong>' + b.service + '</strong><p>' + b.when + '</p></div><span>' + I18N.t(b.status) + '</span></article>';
+        }).join("") : '<p class="muted">' + I18N.t("empty") + '</p>';
+      }
+      document.querySelector("#id-form").addEventListener("submit", function (ev) {
+        ev.preventDefault();
+        client = Store.upsertClient(tenantId, { name: document.querySelector("#name").value.trim(), phone: document.querySelector("#phone").value });
+        document.querySelector("#identify").hidden = true;
+        document.querySelector("#app").hidden = false;
+        document.querySelector("#hello").textContent = I18N.t("hello_client") + ", " + client.name;
+        document.querySelector("#points").textContent = (client.points || 0) + " " + I18N.t("points");
+        document.querySelector("#service").innerHTML = config.services.map(function (s) { return '<option value="' + s.id + '">' + s.name + ' \u00b7 ' + money(s.price) + '</option>'; }).join("");
+        const start = new Date(); start.setMinutes(0,0,0); start.setHours(start.getHours()+2);
+        document.querySelector("#when").value = start.toISOString().slice(0,16);
+        paintMine();
+      });
+      document.querySelector("#book-form").addEventListener("submit", function (ev) {
+        ev.preventDefault();
+        const service = config.services.find(function (s) { return s.id === document.querySelector("#service").value; });
+        Store.addBooking(tenantId, { id: crypto.randomUUID(), client: client.name, phone: client.phone, service: service.name, when: document.querySelector("#when").value.replace("T"," "), guarantee: service.guarantee, prepaid: true, special: false, status: "pending", created_at: new Date().toISOString() });
+        Store.addPoints(tenantId, client.phone, 10);
+        client = Store.findClient(tenantId, client.phone);
+        document.querySelector("#points").textContent = client.points + " " + I18N.t("points");
+        PaymentHub.renderLocal(document.querySelector("#pay-panel"), config, { amount: service.guarantee, reference: service.name + " \u00b7 " + client.name });
+        paintMine();
+      });
+      window.addEventListener("agency:lang", function () { I18N.apply(); if (client) paintMine(); });
+    })();
+  </script>
+</body>
+</html>

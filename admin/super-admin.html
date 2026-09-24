@@ -4,33 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Super Admin</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/agency-theme.css" />
 </head>
 <body>
   <main class="shell">
     <header class="topbar">
-      <div class="brand-mark"><span class="logo-dot">S</span> Super Admin \u00b7 USD</div>
-      <div class="nav-actions">
-        <div id="lang-mount"></div>
-        <a class="btn btn-ghost" href="../index.html" data-i18n="admin_showcase"></a>
-      </div>
+      <div class="brand-mark"><span class="logo-dot">S</span> Super Admin · USD</div>
+      <div class="nav-actions"><div id="lang-mount"></div><a class="btn btn-ghost" href="../index.html" data-i18n="admin_showcase">Vitrine</a></div>
     </header>
     <section class="hero">
-      <p class="kicker" data-i18n="admin_kicker"></p>
-      <h1 data-i18n="admin_title"></h1>
-      <p class="muted" data-i18n="admin_lead"></p>
-      <p class="notice" data-i18n="admin_notice"></p>
+      <p class="kicker" data-i18n="admin_kicker">Controle</p>
+      <h1 data-i18n="admin_title">Comercios</h1>
+      <p class="notice">Senha: usd2026</p>
     </section>
     <section class="card admin-wrap" id="gate">
-      <label data-i18n="admin_pin"></label>
+      <label data-i18n="admin_pin">Senha</label>
       <input id="pin" type="password" placeholder="usd2026" />
-      <div style="margin-top:12px;"><button class="btn btn-primary" id="unlock" type="button" data-i18n="admin_enter"></button></div>
+      <div style="margin-top:12px"><button class="btn btn-primary" id="unlock" type="button" data-i18n="admin_enter">Entrar</button></div>
     </section>
     <section id="board" hidden><div id="rows"></div></section>
   </main>
+  <script src="../core/license-code.js"></script>
   <script src="../core/auth-engine.js"></script>
   <script src="../js/i18n.js"></script>
   <script>
@@ -47,11 +41,13 @@
     async function render() {
       I18N.apply();
       const data = await AuthEngine.load();
-      rows.innerHTML = data.tenants.map(function (t) {
+      const cards = await Promise.all(data.tenants.map(async function (t) {
         const active = AuthEngine.isActiveStatus(t.status);
         const next = active ? "Suspenso" : "Activo";
-        return '<article class="admin-row"><div><h3>' + t.trade_name + '</h3><p class="muted">' + t.tenant_id + ' \u00b7 ' + t.country + ' \u00b7 ' + I18N.t("until") + ' ' + t.license_until + '</p><p><span class="status-dot ' + (active ? "on" : "off") + '"></span>' + t.status + ' \u00b7 US$ ' + t.monthly_fee_usd + I18N.t("per_month") + '</p></div><div class="nav-actions"><a class="btn btn-ghost" href="../templates/login.html?tenant=' + t.tenant_id + '">' + I18N.t("admin_open_login") + '</a><button class="btn ' + (active ? "btn-danger" : "btn-ok") + '" data-id="' + t.tenant_id + '" data-next="' + next + '">' + (active ? I18N.t("suspend") : I18N.t("reactivate")) + '</button></div></article>';
-      }).join("");
+        const code = await LicenseCode.monthlyCode(t.tenant_id);
+        return '<article class="admin-row"><div><h3>' + t.trade_name + '</h3><p class="muted">' + t.tenant_id + ' \u00b7 ' + t.country + '</p><p><span class="status-dot ' + (active ? "on" : "off") + '"></span>' + t.status + ' \u00b7 US$ ' + t.monthly_fee_usd + '</p><p class="mono">' + I18N.t("month_code") + ': <strong>' + code + '</strong></p></div><div class="nav-actions"><a class="btn btn-ghost" href="../templates/login.html?tenant=' + t.tenant_id + '">' + I18N.t("admin_open_login") + '</a><button class="btn ' + (active ? "btn-danger" : "btn-ok") + '" data-id="' + t.tenant_id + '" data-next="' + next + '">' + (active ? I18N.t("suspend") : I18N.t("reactivate")) + '</button></div></article>';
+      }));
+      rows.innerHTML = cards.join("");
       rows.querySelectorAll("button[data-id]").forEach(function (btn) {
         btn.addEventListener("click", async function () { await AuthEngine.setTenantStatus(btn.dataset.id, btn.dataset.next); render(); });
       });
