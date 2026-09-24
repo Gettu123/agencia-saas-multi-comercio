@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Super Admin \u00b7 Agencia SaaS</title>
+  <title>Super Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet" />
@@ -12,56 +12,51 @@
 <body>
   <main class="shell">
     <header class="topbar">
-      <div class="brand-mark">
-        <span class="logo-dot">S</span>
-        Super Admin \u00b7 Licencas USD
+      <div class="brand-mark"><span class="logo-dot">S</span> Super Admin \u00b7 USD</div>
+      <div class="nav-actions">
+        <div id="lang-mount"></div>
+        <a class="btn btn-ghost" href="../index.html" data-i18n="admin_showcase"></a>
       </div>
-      <a class="btn btn-ghost" href="../index.html">Ver vitrine</a>
     </header>
     <section class="hero">
-      <p class="kicker">Controle internacional</p>
-      <h1>Comercios associados</h1>
-      <p class="muted">Um clique troca o status entre <strong>Activo / 主动</strong> e <strong>Suspenso</strong>. O login do tenant intercepta e mostra a regularizacao em USD.</p>
-      <p class="notice">Demo Pages: status salvo neste navegador (localStorage). Producao: API + banco. Senha: <strong>usd2026</strong></p>
+      <p class="kicker" data-i18n="admin_kicker"></p>
+      <h1 data-i18n="admin_title"></h1>
+      <p class="muted" data-i18n="admin_lead"></p>
+      <p class="notice" data-i18n="admin_notice"></p>
     </section>
     <section class="card admin-wrap" id="gate">
-      <label>Senha do super admin</label>
+      <label data-i18n="admin_pin"></label>
       <input id="pin" type="password" placeholder="usd2026" />
-      <div style="margin-top:12px;"><button class="btn btn-primary" id="unlock" type="button">Entrar</button></div>
+      <div style="margin-top:12px;"><button class="btn btn-primary" id="unlock" type="button" data-i18n="admin_enter"></button></div>
     </section>
     <section id="board" hidden><div id="rows"></div></section>
   </main>
   <script src="../core/auth-engine.js"></script>
+  <script src="../js/i18n.js"></script>
   <script>
     const PIN = "usd2026";
     const gate = document.querySelector("#gate");
     const board = document.querySelector("#board");
     const rows = document.querySelector("#rows");
-    if (sessionStorage.getItem("agency.super") === "1") {
-      gate.hidden = true;
-      board.hidden = false;
-    }
+    I18N.mount("#lang-mount"); I18N.apply();
+    if (sessionStorage.getItem("agency.super") === "1") { gate.hidden = true; board.hidden = false; }
     document.querySelector("#unlock").addEventListener("click", function () {
-      if (document.querySelector("#pin").value !== PIN) { alert("Senha invalida"); return; }
-      sessionStorage.setItem("agency.super", "1");
-      gate.hidden = true;
-      board.hidden = false;
-      render();
+      if (document.querySelector("#pin").value !== PIN) { alert(I18N.t("admin_bad_pin")); return; }
+      sessionStorage.setItem("agency.super", "1"); gate.hidden = true; board.hidden = false; render();
     });
     async function render() {
+      I18N.apply();
       const data = await AuthEngine.load();
       rows.innerHTML = data.tenants.map(function (t) {
         const active = AuthEngine.isActiveStatus(t.status);
         const next = active ? "Suspenso" : "Activo";
-        return '<article class="admin-row"><div><h3>' + t.trade_name + '</h3><p class="muted">' + t.tenant_id + ' \u00b7 ' + t.country + ' \u00b7 ' + t.plan + ' \u00b7 ate ' + t.license_until + '</p><p><span class="status-dot ' + (active ? "on" : "off") + '"></span>' + t.status + ' \u00b7 US$ ' + t.monthly_fee_usd + '/mes</p></div><div class="nav-actions"><a class="btn btn-ghost" href="../templates/login.html?tenant=' + t.tenant_id + '">Abrir login</a><button class="btn ' + (active ? "btn-danger" : "btn-ok") + '" data-id="' + t.tenant_id + '" data-next="' + next + '">' + (active ? "Suspender" : "Reativar") + '</button></div></article>';
+        return '<article class="admin-row"><div><h3>' + t.trade_name + '</h3><p class="muted">' + t.tenant_id + ' \u00b7 ' + t.country + ' \u00b7 ' + I18N.t("until") + ' ' + t.license_until + '</p><p><span class="status-dot ' + (active ? "on" : "off") + '"></span>' + t.status + ' \u00b7 US$ ' + t.monthly_fee_usd + I18N.t("per_month") + '</p></div><div class="nav-actions"><a class="btn btn-ghost" href="../templates/login.html?tenant=' + t.tenant_id + '">' + I18N.t("admin_open_login") + '</a><button class="btn ' + (active ? "btn-danger" : "btn-ok") + '" data-id="' + t.tenant_id + '" data-next="' + next + '">' + (active ? I18N.t("suspend") : I18N.t("reactivate")) + '</button></div></article>';
       }).join("");
       rows.querySelectorAll("button[data-id]").forEach(function (btn) {
-        btn.addEventListener("click", async function () {
-          await AuthEngine.setTenantStatus(btn.dataset.id, btn.dataset.next);
-          render();
-        });
+        btn.addEventListener("click", async function () { await AuthEngine.setTenantStatus(btn.dataset.id, btn.dataset.next); render(); });
       });
     }
+    window.addEventListener("agency:lang", function () { I18N.apply(); if (!board.hidden) render(); });
     if (!board.hidden) render();
   </script>
 </body>
