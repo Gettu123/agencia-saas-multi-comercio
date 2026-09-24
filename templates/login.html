@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login \u00b7 Agencia SaaS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/agency-theme.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand-mark">
+        <span class="logo-dot" id="logo">A</span>
+        <span data-brand>Agencia SaaS</span>
+      </div>
+      <a class="btn btn-ghost" href="../index.html">Trocar comercio</a>
+    </header>
+    <section class="hero" id="login-card">
+      <p class="kicker" data-i18n="product">Agendamento com Garantia e Fidelidade</p>
+      <h1 data-i18n="login_title">Entrar no painel</h1>
+      <p class="muted" id="subtitle" data-i18n="login_subtitle"></p>
+      <p class="muted" id="demo-hint"></p>
+      <form id="login-form">
+        <label data-i18n="email">E-mail</label>
+        <input id="email" type="email" required autocomplete="username" />
+        <label data-i18n="password">Senha</label>
+        <input id="password" type="password" required autocomplete="current-password" />
+        <p id="error" class="muted" style="color: var(--danger); min-height: 1.2em;"></p>
+        <button class="btn btn-primary" type="submit" data-i18n="enter">Entrar</button>
+      </form>
+    </section>
+    <section class="hero lock" id="block-card" hidden>
+      <p class="kicker">USD \u00b7 International license</p>
+      <h1 id="block-title">Licenca suspensa</h1>
+      <p class="muted" id="block-lead"></p>
+      <p class="usd" id="fee">US$ 29</p>
+      <p class="muted" id="trade-name"></p>
+      <div class="pay-methods" id="usd-methods"></div>
+    </section>
+  </main>
+  <script src="../core/auth-engine.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/tenant-loader.js"></script>
+  <script>
+    (async function () {
+      const params = new URLSearchParams(location.search);
+      const tenantId = params.get("tenant") || "tenant_001_br";
+      const forceBlocked = params.get("blocked") === "1";
+      const config = await TenantLoader.load(tenantId);
+      const lang = config.language || "pt";
+      const t = function (k) { return I18N.t(lang, k); };
+      document.documentElement.lang = config.locale;
+      document.querySelector("[data-brand]").textContent = config.brand.name;
+      document.querySelector("#logo").textContent = config.brand.logo_text.slice(0, 1);
+      document.querySelectorAll("[data-i18n]").forEach(function (n) { n.textContent = t(n.dataset.i18n); });
+      document.querySelector("#demo-hint").textContent = lang === "es" ? "Demo: admin@leon.local / 1234" : "Demo: admin@aurora.local / 1234";
+      document.querySelector("#email").value = config.demo_users[0].email;
+      const validation = await AuthEngine.validateTenant(tenantId);
+      const agency = (await AuthEngine.getLicenses()).agency;
+      function showBlock() {
+        document.querySelector("#login-card").hidden = true;
+        document.querySelector("#block-card").hidden = false;
+        document.querySelector("#block-title").textContent = t("blocked_title");
+        document.querySelector("#block-lead").textContent = t("blocked_lead");
+        document.querySelector("#fee").textContent = "US$ " + ((validation.license && validation.license.monthly_fee_usd) || agency.monthly_fee_usd);
+        document.querySelector("#trade-name").textContent = (validation.license && validation.license.trade_name) || config.brand.name;
+        const r = agency.regularization;
+        document.querySelector("#usd-methods").innerHTML =
+          "<article><strong>Binance Pay</strong><p class=\"muted\">" + r.binance_pay + "</p></article>" +
+          "<article><strong>PayPal</strong><p class=\"muted\">" + r.paypal + "</p></article>" +
+          "<article><strong>Retorna</strong><p class=\"muted\">" + r.retorna + "</p></article>" +
+          "<article><strong>WhatsApp</strong><p class=\"muted\">" + r.whatsapp + " \u00b7 " + r.email + "</p></article>";
+      }
+      if (!validation.active || forceBlocked) { showBlock(); return; }
+      document.querySelector("#login-form").addEventListener("submit", function (ev) {
+        ev.preventDefault();
+        const email = document.querySelector("#email").value.trim().toLowerCase();
+        const password = document.querySelector("#password").value;
+        const user = config.demo_users.find(function (u) { return u.email.toLowerCase() === email && u.password === password; });
+        if (!user) {
+          document.querySelector("#error").textContent = lang === "es" ? "Credenciales invalidas." : "Credenciais invalidas.";
+          return;
+        }
+        AuthEngine.setSession({
+          tenant_id: tenantId,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          points: 120,
+          logged_at: new Date().toISOString()
+        });
+        location.href = "./index.html?tenant=" + encodeURIComponent(tenantId);
+      });
+    })().catch(function (err) {
+      document.body.innerHTML = "<main class=\"shell\"><p>" + err.message + "</p></main>";
+    });
+  </script>
+</body>
+</html>
