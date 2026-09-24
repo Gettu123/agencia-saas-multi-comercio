@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "updated_at": "2026-09-24T12:00:00Z",
+  "updated_at": "2026-09-24T16:20:00Z",
   "agency": {
     "name": "Agencia SaaS Multi-Comercio",
     "owner": "Marcelo Volponi",
@@ -10,8 +10,8 @@
       "binance_pay": "BINANCE-PAY-ID-AGENCIA",
       "paypal": "paypal.me/agenciasaas",
       "retorna": "RETORNA-ID-AGENCIA",
-      "whatsapp": "+55 19 99999-0000",
-      "email": "licencias@agencia-saas.com",
+      "whatsapp": "+55 19 98608-3932",
+      "email": "sanderolameda@gmail.com",
       "note": "Cobranca internacional da licenca mensal em dolares (USD)."
     }
   },
